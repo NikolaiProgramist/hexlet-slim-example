@@ -1,0 +1,24 @@
+{
+    "name": "nikolai/hexlet-slim-example",
+    "description": "Slim project",
+    "type": "project",
+    "require": {
+        "slim/slim": "^4.14",
+        "slim/psr7": "^1.7",
+        "slim/http": "^1.4",
+        "slim/php-view": "^3.4",
+        "php-di/php-di": "^7.0"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Nikolai\\HexletSlimExample\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "NikolaiProgramist",
+            "email": "nikluk2005@mail.ru"
+        }
+    ]
+}
