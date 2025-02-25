@@ -12,4 +12,6 @@ $app->get('/', function ($request, $response) {
     return $response;
 });
 
+$app->get('/users', fn ($request, $response) => $response->write('GET /users'));
+
 $app->run();
