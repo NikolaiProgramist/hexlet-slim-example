@@ -14,4 +14,6 @@ $app->get('/', function ($request, $response) {
 
 $app->get('/users', fn ($request, $response) => $response->write('GET /users'));
 
+$app->post('/users', fn ($request, $response) => $response->withStatus(302));
+
 $app->run();
