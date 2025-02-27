@@ -16,4 +16,9 @@ $app->get('/users', fn ($request, $response) => $response->write('GET /users'));
 
 $app->post('/users', fn ($request, $response) => $response->withStatus(302));
 
+$app->get('/courses/{id}', function ($request, $response, array $args) {
+    $id = $args['id'];
+    return $response->write("Course id: {$id}");
+});
+
 $app->run();
