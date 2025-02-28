@@ -1,0 +1,15 @@
+<h1>New User</h1>
+
+<hr>
+
+<form action="/users" method="post">
+    <div>
+        <label for="user[nickname]">Nickname:</label>
+        <input type="text" required name="user[nickname]">
+    </div>
+    <div>
+        <label for="user[email]">Email:</label>
+        <input type="email" required name="user[email]">
+    </div>
+    <input type="submit">
+</form>

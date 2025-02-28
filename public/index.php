@@ -5,8 +5,6 @@ require __DIR__ . '/../vendor/autoload.php';
 use Slim\Factory\AppFactory;
 use DI\Container;
 
-$users = ['mike', 'mishel', 'adel', 'lary', 'kamila'];
-
 $container = new Container();
 $container->set('renderer', fn () => new \Slim\Views\PhpRenderer(__DIR__ . '/../templates'));
 
@@ -18,15 +16,29 @@ $app->get('/', function ($request, $response) {
     return $response;
 });
 
-$app->get('/users', function ($request, $response) use ($users) {
+$app->get('/users', function ($request, $response) {
+    $users = json_decode(file_get_contents('cache/users'), true);
     $u = $request->getParam('u');
-    $resultUsers = array_filter($users, fn ($user) => str_contains($user, $u));
+    $resultUsers = array_filter($users, fn ($user) => str_contains(strtolower($user['nickname']), strtolower($u)));
+    sort($resultUsers);
     $params = ['users' => $resultUsers];
 
     return $this->get('renderer')->render($response, 'users/index.phtml', $params);
 });
 
-$app->post('/users', fn ($request, $response) => $response->withStatus(302));
+$app->get('/users/new', function ($request, $response) {
+    return $this->get('renderer')->render($response, 'users/new.phtml');
+});
+
+$app->post('/users', function ($request, $response) {
+    $users = json_decode(file_get_contents('cache/users'), true);
+    $data = $request->getParsedBodyParam('user');
+    $id = random_int(1, 100);
+    $users[] = ['id' => $id, 'nickname' => $data['nickname'], 'email' => $data['email']];
+    file_put_contents('cache/users', json_encode($users));
+
+    return $response->withRedirect('/users', 302);
+});
 
 $app->get('/courses/{id}', function ($request, $response, array $args) {
     $id = $args['id'];
