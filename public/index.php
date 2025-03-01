@@ -26,11 +26,11 @@ $app->get('/users', function ($request, $response) {
     $params = ['users' => $resultUsers];
 
     return $this->get('renderer')->render($response, 'users/index.phtml', $params);
-})->setName('users');
+})->setName('users.index');
 
 $app->get('/users/new', function ($request, $response) {
     return $this->get('renderer')->render($response, 'users/new.phtml');
-})->setName('createUser');
+})->setName('users.create');
 
 $app->post('/users', function ($request, $response) use ($router) {
     $users = json_decode(file_get_contents('cache/users'), true);
@@ -39,17 +39,17 @@ $app->post('/users', function ($request, $response) use ($router) {
     $users[] = ['id' => $id, 'nickname' => $data['nickname'], 'email' => $data['email']];
     file_put_contents('cache/users', json_encode($users));
 
-    return $response->withRedirect($router->urlFor('users'), 302);
-});
+    return $response->withRedirect($router->urlFor('users.index'), 302);
+})->setName('users.store');
 
 $app->get('/courses/{id}', function ($request, $response, array $args) {
     $id = $args['id'];
     return $response->write("Course id: {$id}");
-})->setName('course');
+})->setName('courses.show');
 
 $app->get('/users/{id}', function ($request, $response, array $args) {
     $params = ['id' => $args['id'], 'nickname' => 'user-' . $args['id']];
     return $this->get('renderer')->render($response, 'users/show.phtml', $params);
-})->setName('user');
+})->setName('users.show');
 
 $app->run();
