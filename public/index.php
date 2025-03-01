@@ -48,7 +48,15 @@ $app->get('/courses/{id}', function ($request, $response, array $args) {
 })->setName('courses.show');
 
 $app->get('/users/{id}', function ($request, $response, array $args) {
-    $params = ['id' => $args['id'], 'nickname' => 'user-' . $args['id']];
+    $users = json_decode(file_get_contents('cache/users'), true);
+    $id = (int) $args['id'];
+    $user = array_values(array_filter($users, fn ($user) => $user['id'] === $id))[0];
+
+    if (empty($user)) {
+        return $response->withStatus(404);
+    }
+    
+    $params = ['user' => $user];
     return $this->get('renderer')->render($response, 'users/show.phtml', $params);
 })->setName('users.show');
 
