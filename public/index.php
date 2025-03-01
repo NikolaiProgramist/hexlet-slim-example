@@ -5,8 +5,11 @@ require __DIR__ . '/../vendor/autoload.php';
 use Slim\Factory\AppFactory;
 use DI\Container;
 
+session_start();
+
 $container = new Container();
 $container->set('renderer', fn () => new \Slim\Views\PhpRenderer(__DIR__ . '/../templates'));
+$container->set('flash', fn () => new \Slim\Flash\Messages());
 
 $app = AppFactory::createFromContainer($container);
 $app->addErrorMiddleware(true, true, true);
@@ -19,11 +22,16 @@ $app->get('/', function ($request, $response) {
 })->setName('/');
 
 $app->get('/users', function ($request, $response) {
+    $messages = $this->get('flash')->getMessages();
     $users = json_decode(file_get_contents('cache/users'), true);
     $u = $request->getParam('u');
     $resultUsers = array_filter($users, fn ($user) => str_contains(strtolower($user['nickname']), strtolower($u)));
     sort($resultUsers);
-    $params = ['users' => $resultUsers];
+
+    $params = [
+        'messages' => $messages,
+        'users' => $resultUsers
+    ];
 
     return $this->get('renderer')->render($response, 'users/index.phtml', $params);
 })->setName('users.index');
@@ -38,6 +46,8 @@ $app->post('/users', function ($request, $response) use ($router) {
     $id = random_int(1, 100);
     $users[] = ['id' => $id, 'nickname' => $data['nickname'], 'email' => $data['email']];
     file_put_contents('cache/users', json_encode($users));
+
+    $this->get('flash')->addMessage('success', 'User was added successfully');
 
     return $response->withRedirect($router->urlFor('users.index'), 302);
 })->setName('users.store');

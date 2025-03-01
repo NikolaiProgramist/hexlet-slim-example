@@ -1,6 +1,23 @@
+<h1>Users</h1>
+
+<?php
+    if (!empty($messages)) :
+        foreach ($messages as $s => $value) :
+            foreach ($value as $m) :
+?>
+<span style="color: <?php echo $s === 'success' ? 'green' : 'red' ?>"><?=$m?></span>
+<br>
+<?php
+            endforeach;
+        endforeach;
+    endif;
+?>
+
+<hr>
+
 <form action="/users" method="get">
     <input type="search" name="u">
-    <input type="submit">
+    <input type="submit" value="Search">
 </form>
 
 <hr>
