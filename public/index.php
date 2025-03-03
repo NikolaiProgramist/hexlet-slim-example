@@ -139,4 +139,14 @@ $app->patch('/users/{id}', function ($request, $response, array $args) use ($rou
     return $this->get('renderer')->render($response->withStatus(422), 'users/edit.phtml', $params);
 })->setName('editUser');
 
+$app->delete('/users/{id}', function ($request, $response, array $args) use ($router) {
+    $id = $args['id'];
+    $users = json_decode(file_get_contents('cache/users'), true);
+    unset($users[$id]);
+    file_put_contents('cache/users', json_encode($users));
+    $this->get('flash')->addMessage('success', 'User has been removed successfully');
+
+    return $response->withRedirect($router->urlFor('users'), 302);
+});
+
 $app->run();

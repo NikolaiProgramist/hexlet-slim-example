@@ -1,3 +1,8 @@
 <span>id = <?=htmlspecialchars($user['id'])?></span>
 <br>
 <span>nickname = <?=htmlspecialchars($user['nickname'])?></span>
+
+<form action="/users/<?=htmlspecialchars($user['id'])?>" method="post">
+    <input type="hidden" name="_METHOD" value="DELETE">
+    <input type="submit" value="Remove">
+</form>
