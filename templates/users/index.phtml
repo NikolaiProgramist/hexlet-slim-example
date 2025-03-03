@@ -24,6 +24,6 @@
 
 <ul>
     <?php foreach ($users as $user) : ?>
-        <li><i><?=$user['nickname']?></i></li>
+        <li><i><?=htmlspecialchars($user['nickname'])?></i></li>
     <?php endforeach; ?>
 </ul>
