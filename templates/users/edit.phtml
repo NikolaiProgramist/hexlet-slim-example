@@ -1,21 +1,23 @@
-<h1>New User</h1>
+<h1>Update User</h1>
 
 <hr>
 
-<form action="/users" method="post">
+<form action="/users/<?=$user['id']?>" method="post">
+    <input type="hidden" name="_METHOD" value="PATCH">
     <div>
         <label for="user[nickname]">Nickname:</label>
-        <input type="text" required name="user[nickname]" value="<?=!empty($data) ? $data['nickname'] : ''?>">
+        <input type="text" required name="user[nickname]" value="<?=!empty($user) ? $user['nickname'] : ''?>">
         <?php if (!empty($errors)) : ?>
             <div style="color: red"><span><?=$errors['nickname']?></span></div>
         <?php endif; ?>
     </div>
     <div>
         <label for="user[email]">Email:</label>
-        <input type="email" required name="user[email]" value="<?=!empty($data) ? $data['email'] : ''?>">
+        <input type="email" required name="user[email]" value="<?=!empty($user) ? $user['email'] : ''?>">
         <?php if (!empty($errors)) : ?>
             <div style="color: red"><span><?=$errors['email']?></span></div>
         <?php endif; ?>
     </div>
-    <input type="submit" value="Create">
+    <input type="submit" value="Update">
 </form>
+
