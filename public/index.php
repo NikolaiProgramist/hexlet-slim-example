@@ -19,7 +19,7 @@ $router = $app->getRouteCollector()->getRouteParser();
 $app->get('/', function ($request, $response) {
     $response->getBody()->write('Welcome to Slim!');
     return $response;
-})->setName('/');
+});
 
 $app->get('/users', function ($request, $response) {
     $messages = $this->get('flash')->getMessages();
@@ -34,7 +34,7 @@ $app->get('/users', function ($request, $response) {
     ];
 
     return $this->get('renderer')->render($response, 'users/index.phtml', $params);
-})->setName('users.index');
+})->setName('users');
 
 $app->get('/users/new', function ($request, $response) {
     return $this->get('renderer')->render($response, 'users/new.phtml');
@@ -49,13 +49,13 @@ $app->post('/users', function ($request, $response) use ($router) {
 
     $this->get('flash')->addMessage('success', 'User was added successfully');
 
-    return $response->withRedirect($router->urlFor('users.index'), 302);
+    return $response->withRedirect($router->urlFor('users'), 302);
 })->setName('users.store');
 
 $app->get('/courses/{id}', function ($request, $response, array $args) {
     $id = $args['id'];
     return $response->write("Course id: {$id}");
-})->setName('courses.show');
+})->setName('course');
 
 $app->get('/users/{id}', function ($request, $response, array $args) {
     $users = json_decode(file_get_contents('cache/users'), true);
@@ -68,6 +68,6 @@ $app->get('/users/{id}', function ($request, $response, array $args) {
     
     $params = ['user' => $user];
     return $this->get('renderer')->render($response, 'users/show.phtml', $params);
-})->setName('users.show');
+})->setName('user');
 
 $app->run();
