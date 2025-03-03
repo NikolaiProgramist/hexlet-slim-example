@@ -4,6 +4,7 @@ require __DIR__ . '/../vendor/autoload.php';
 
 use Slim\Factory\AppFactory;
 use DI\Container;
+use Nikolai\HexletSlimExample\Validator;
 
 session_start();
 
@@ -37,19 +38,36 @@ $app->get('/users', function ($request, $response) {
 })->setName('users');
 
 $app->get('/users/new', function ($request, $response) {
-    return $this->get('renderer')->render($response, 'users/new.phtml');
-})->setName('users.create');
+    $params = [
+        'userData' => [],
+        'errors' => []
+    ];
+
+    return $this->get('renderer')->render($response, 'users/new.phtml', $params);
+})->setName('newUser');
 
 $app->post('/users', function ($request, $response) use ($router) {
+    $validator = new Validator();
     $users = json_decode(file_get_contents('cache/users'), true);
     $data = $request->getParsedBodyParam('user');
-    $id = random_int(1, 100);
-    $users[] = ['id' => $id, 'nickname' => $data['nickname'], 'email' => $data['email']];
-    file_put_contents('cache/users', json_encode($users));
+    $errors = $validator->validate($data);
 
-    $this->get('flash')->addMessage('success', 'User was added successfully');
+    if (count($errors) === 0) {
+        $id = random_int(1, 100);
+        $users[] = ['id' => $id, 'nickname' => $data['nickname'], 'email' => $data['email']];
+        file_put_contents('cache/users', json_encode($users));
+        $this->get('flash')->addMessage('success', 'User was added successfully');
 
-    return $response->withRedirect($router->urlFor('users'), 302);
+        return $response->withRedirect($router->urlFor('users'), 302);
+    }
+
+    $params = [
+        'data' => $data,
+        'errors' => $errors
+    ];
+
+    $response = $response->withStatus(422);
+    return $this->get('renderer')->render($response, 'users/new.phtml', $params);
 })->setName('users.store');
 
 $app->get('/courses/{id}', function ($request, $response, array $args) {
