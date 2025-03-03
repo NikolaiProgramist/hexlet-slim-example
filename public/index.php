@@ -22,14 +22,14 @@ $app->get('/', function ($request, $response) {
 });
 
 $app->get('/users', function ($request, $response) {
-    $messages = $this->get('flash')->getMessages();
+    $flash = $this->get('flash')->getMessages();
     $users = json_decode(file_get_contents('cache/users'), true);
     $u = $request->getParam('u');
     $resultUsers = array_filter($users, fn ($user) => str_contains(strtolower($user['nickname']), strtolower($u)));
     sort($resultUsers);
 
     $params = [
-        'messages' => $messages,
+        'flash' => $flash,
         'users' => $resultUsers
     ];
 

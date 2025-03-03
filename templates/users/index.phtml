@@ -1,9 +1,9 @@
 <h1>Users</h1>
 
 <?php
-    if (!empty($messages)) :
-        foreach ($messages as $s => $value) :
-            foreach ($value as $m) :
+    if (!empty($flash)) :
+        foreach ($flash as $s => $messages) :
+            foreach ($messages as $m) :
 ?>
 <span style="color: <?php echo $s === 'success' ? 'green' : 'red' ?>"><?=$m?></span>
 <br>
