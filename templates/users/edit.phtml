@@ -6,14 +6,14 @@
     <input type="hidden" name="_METHOD" value="PATCH">
     <div>
         <label for="user[nickname]">Nickname:</label>
-        <input type="text" required name="user[nickname]" value="<?=!empty($user) ? $user['nickname'] : ''?>">
+        <input type="text" required name="user[nickname]" value="<?=!empty($user) ? htmlspecialchars($user['nickname']) : ''?>">
         <?php if (!empty($errors)) : ?>
             <div style="color: red"><span><?=$errors['nickname']?></span></div>
         <?php endif; ?>
     </div>
     <div>
         <label for="user[email]">Email:</label>
-        <input type="email" required name="user[email]" value="<?=!empty($user) ? $user['email'] : ''?>">
+        <input type="email" required name="user[email]" value="<?=!empty($user) ? htmlspecialchars($user['email']) : ''?>">
         <?php if (!empty($errors)) : ?>
             <div style="color: red"><span><?=$errors['email']?></span></div>
         <?php endif; ?>
