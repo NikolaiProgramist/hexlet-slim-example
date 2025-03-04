@@ -26,7 +26,7 @@ $app->get('/', function ($request, $response) {
 
 $app->get('/users', function ($request, $response) {
     $flash = $this->get('flash')->getMessages();
-    $users = json_decode(file_get_contents('cache/users'), true);
+    $users = json_decode($request->getCookieParam('users', json_encode([])), true);
     $u = $request->getParam('u');
     $resultUsers = array_filter($users, fn ($user) => str_contains(strtolower($user['nickname']), strtolower($u)));
     sort($resultUsers);
@@ -50,17 +50,17 @@ $app->get('/users/new', function ($request, $response) {
 
 $app->post('/users', function ($request, $response) use ($router) {
     $validator = new Validator();
-    $users = json_decode(file_get_contents('cache/users'), true);
+    $users = json_decode($request->getCookieParam('users', json_encode([])), true);
     $data = $request->getParsedBodyParam('user');
     $errors = $validator->validate($data);
 
     if (count($errors) === 0) {
         $id = random_int(1, 100);
         $users[$id] = ['id' => $id, 'nickname' => $data['nickname'], 'email' => $data['email']];
-        file_put_contents('cache/users', json_encode($users));
+        $users = json_encode($users);
         $this->get('flash')->addMessage('success', 'User was added successfully');
 
-        return $response->withRedirect($router->urlFor('users'), 302);
+        return $response->withHeader('Set-Cookie', "users={$users}")->withRedirect($router->urlFor('users'), 302);
     }
 
     $params = [
@@ -78,7 +78,7 @@ $app->get('/courses/{id}', function ($request, $response, array $args) {
 })->setName('course');
 
 $app->get('/users/{id}', function ($request, $response, array $args) {
-    $users = json_decode(file_get_contents('cache/users'), true);
+    $users = json_decode($request->getCookieParam('users', json_encode([])), true);
     $id = (int) $args['id'];
     $user = array_values(array_filter($users, fn ($user) => $user['id'] === $id))[0];
 
@@ -92,7 +92,7 @@ $app->get('/users/{id}', function ($request, $response, array $args) {
 
 $app->get('/users/{id}/edit', function ($request, $response, array $args) use ($router) {
     $id = $args['id'];
-    $users = json_decode(file_get_contents('cache/users'), true);
+    $users = json_decode($request->getCookieParam('users', json_encode([])), true);
     $user = array_values(array_filter($users, fn ($user) => $user['id'] === (int) $id))[0];
 
     if (empty($user)) {
@@ -110,7 +110,7 @@ $app->get('/users/{id}/edit', function ($request, $response, array $args) use ($
 
 $app->patch('/users/{id}', function ($request, $response, array $args) use ($router) {
     $id = $args['id'];
-    $users = json_decode(file_get_contents('cache/users'), true);
+    $users = json_decode($request->getCookieParam('users', json_encode([])), true);
     $user = array_values(array_filter($users, fn ($user) => $user['id'] === (int) $id))[0];
 
     if (empty($user)) {
@@ -125,10 +125,10 @@ $app->patch('/users/{id}', function ($request, $response, array $args) use ($rou
     if (count($errors) === 0) {
         $users[$id]['nickname'] = $data['nickname'];
         $users[$id]['email'] = $data['email'];
-        file_put_contents('cache/users', json_encode($users));
+        $users = json_encode($users);
         $this->get('flash')->addMessage('success', 'User updated successfully');
 
-        return $response->withRedirect($router->urlFor('users'), 302);
+        return $response->withHeader('Set-Cookie', "users={$users}")->withRedirect($router->urlFor('users'), 302);
     }
 
     $params = [
@@ -141,12 +141,12 @@ $app->patch('/users/{id}', function ($request, $response, array $args) use ($rou
 
 $app->delete('/users/{id}', function ($request, $response, array $args) use ($router) {
     $id = $args['id'];
-    $users = json_decode(file_get_contents('cache/users'), true);
+    $users = json_decode($request->getCookieParam('users', json_encode([])), true);
     unset($users[$id]);
-    file_put_contents('cache/users', json_encode($users));
+    $users = json_encode($users);
     $this->get('flash')->addMessage('success', 'User has been removed successfully');
 
-    return $response->withRedirect($router->urlFor('users'), 302);
+    return $response->withHeader('Set-Cookie', "users={$users}")->withRedirect($router->urlFor('users'), 302);
 });
 
 $app->run();
