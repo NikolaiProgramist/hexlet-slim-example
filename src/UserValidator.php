@@ -2,7 +2,7 @@
 
 namespace Nikolai\HexletSlimExample;
 
-class Validator
+class UserValidator
 {
     public function validate(array $userData): array
     {

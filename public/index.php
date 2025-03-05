@@ -5,7 +5,10 @@ require __DIR__ . '/../vendor/autoload.php';
 use Slim\Factory\AppFactory;
 use DI\Container;
 use Slim\Middleware\MethodOverrideMiddleware;
-use Nikolai\HexletSlimExample\Validator;
+use Nikolai\HexletSlimExample\UserValidator;
+use Nikolai\HexletSlimExample\Car;
+use Nikolai\HexletSlimExample\CarValidator;
+use Nikolai\HexletSlimExample\Repositories\CarRepository;
 
 session_start();
 
@@ -58,7 +61,7 @@ $app->get('/users/new', function ($request, $response) {
 })->setName('newUser');
 
 $app->post('/users', function ($request, $response) use ($router) {
-    $validator = new Validator();
+    $validator = new UserValidator();
     $users = json_decode($request->getCookieParam('users', json_encode([])), true);
     $data = $request->getParsedBodyParam('user');
     $errors = $validator->validate($data);
@@ -132,7 +135,7 @@ $app->patch('/users/{id}', function ($request, $response, array $args) use ($rou
     }
 
     $data = $request->getParsedBodyParam('user');
-    $validator = new Validator();
+    $validator = new UserValidator();
     $errors = $validator->validate($data);
 
     if (count($errors) === 0) {
@@ -198,5 +201,68 @@ $app->delete('/logout', function ($request, $response) use ($router) {
 
     return $response->withRedirect($router->urlFor('users'));
 });
+
+$app->get('/cars', function ($request, $response) {
+    $carRepository = $this->get(CarRepository::class);
+    $cars = $carRepository->getEntities();
+    $messages = $this->get('flash')->getMessages();
+
+    $params = [
+        'cars' => $cars,
+        'flash' => $messages
+    ];
+
+    return $this->get('renderer')->render($response, 'cars/index.phtml', $params);
+})->setName('cars.index');
+
+$app->get('/cars/{id}', function ($request, $response, $args) {
+    $carRepository = $this->get(CarRepository::class);
+    $id = $args['id'];
+    $car = $carRepository->find($id);
+
+    if (is_null($car)) {
+        return $response->write('Page not found')->withStatus(404);
+    }
+
+    $messages = $this->get('flash')->getMessages();
+
+    $params = [
+        'car' => $car,
+        'flash' => $messages
+    ];
+
+    return $this->get('renderer')->render($response, 'cars/show.phtml', $params);
+})->setName('cars.show');
+
+$app->get('/cars/new', function ($request, $response) {
+    $params = [
+        'car' => new Car(),
+        'errors' => []
+    ];
+
+    return $this->get('renderer')->render($response, 'cars/new.phtml', $params);
+})->setName('cars.create');
+
+$app->post('/cars', function ($request, $response) use ($router) {
+    $carRepository = $this->get(CarRepository::class);
+    $carData = $request->getParsedBodyParam('car');
+
+    $validator = new CarValidator();
+    $errors = $validator->validate($carData);
+
+    if (count($errors) === 0) {
+        $car = Car::fromArray([$carData['make'], $carData['model']]);
+        $carRepository->save($car);
+        $this->get('flash')->addMessage('success', 'Car was added successfully');
+        return $response->withRedirect($router->urlFor('cars.index'));
+    }
+
+    $params = [
+        'car' => $carData,
+        'errors' => $errors
+    ];
+
+    return $this->get('renderer')->render($response->withStatus(422), 'cars/new.phtml', $params);
+})->setName('cars.store');
 
 $app->run();

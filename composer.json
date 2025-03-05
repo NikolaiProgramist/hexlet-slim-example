@@ -8,7 +8,8 @@
         "slim/http": "^1.4",
         "slim/php-view": "^3.4",
         "php-di/php-di": "^7.0",
-        "slim/flash": "^0.4.0"
+        "slim/flash": "^0.4.0",
+        "ext-pdo": "*"
     },
     "license": "MIT",
     "autoload": {
