@@ -86,7 +86,11 @@ $app->get('/users/{id}', function ($request, $response, array $args) {
         return $response->withStatus(404);
     }
     
-    $params = ['user' => $user];
+    $params = [
+        'user' => $user,
+        'session' => isset($_SESSION['user'])
+    ];
+
     return $this->get('renderer')->render($response, 'users/show.phtml', $params);
 })->setName('user');
 
@@ -147,6 +151,43 @@ $app->delete('/users/{id}', function ($request, $response, array $args) use ($ro
     $this->get('flash')->addMessage('success', 'User has been removed successfully');
 
     return $response->withHeader('Set-Cookie', "users={$users}; path=/; secure; httpOnly")->withRedirect($router->urlFor('users'), 302);
+});
+
+$app->get('/login', function ($request, $response) {
+    $params = [
+        'errors' => ['email' => ''],
+        'email' => ''
+    ];
+
+    return $this->get('renderer')->render($response, 'users/login.phtml', $params);
+})->setName('loginUser');
+
+$app->post('/login', function ($request, $response) use ($router) {
+    $email = $request->getParsedBodyParam('user')['email'];
+    $users = json_decode($request->getCookieParam('users', json_encode([])), true);
+    $user = array_values(array_filter($users, fn ($user) => $user['email'] === $email))[0];
+    $id = $user['id'];
+    $nickname = $user['nickname'];
+
+    if (isset($users[$id])) {
+        session_start();
+        $_SESSION['user'] = ['id' => $id, 'nickname' => $nickname];
+        return $response->withRedirect($router->urlFor('user', ['id' => $id]));
+    }
+
+    $params = [
+        'errors' => ['email' => 'Uncorrected data of user account'],
+        'email' => $email
+    ];
+
+    return $this->get('renderer')->render($response->withStatus(422), '/users/login.phtml', $params);
+});
+
+$app->delete('/logout', function ($request, $response) use ($router) {
+    session_destroy();
+    $_SESSION = [];
+
+    return $response->withRedirect($router->urlFor('users'));
 });
 
 $app->run();

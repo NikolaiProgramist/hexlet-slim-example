@@ -1,0 +1,14 @@
+<h1>User login</h1>
+
+<hr>
+
+<form action="/login" method="post">
+    <div>
+        <label>Email:</label>
+        <input type="email" required name="user[email]" value="<?=$email?>" placeholder="test@mail.ru">
+    </div>
+    <div style="color: red">
+        <span><?=$errors['email']?></span>
+    </div>
+    <input type="submit" value="Login">
+</form>
