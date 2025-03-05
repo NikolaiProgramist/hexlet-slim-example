@@ -12,6 +12,15 @@ session_start();
 $container = new Container();
 $container->set('renderer', fn () => new \Slim\Views\PhpRenderer(__DIR__ . '/../templates'));
 $container->set('flash', fn () => new \Slim\Flash\Messages());
+$container->set(PDO::class, function () {
+    $conn = new PDO('sqlite:database.sqlite');
+    $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+    return $conn;
+});
+
+$initFilePath = implode('/', [dirname(__DIR__), 'init.sql']);
+$initSql = file_get_contents($initFilePath);
+$container->get(PDO::class)->exec($initSql);
 
 $app = AppFactory::createFromContainer($container);
 $app->addErrorMiddleware(true, true, true);
