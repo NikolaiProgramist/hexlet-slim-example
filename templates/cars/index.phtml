@@ -1,0 +1,24 @@
+<h1>Cars</h1>
+
+<?php
+    if (!empty($flash)) :
+        foreach ($flash as $s => $messages) :
+            foreach ($messages as $m) :
+?>
+<span style="color: <?php echo $s === 'success' ? 'green' : 'red' ?>"><?=$m?></span>
+<br>
+<?php
+            endforeach;
+        endforeach;
+    endif;
+?>
+
+<hr>
+
+<hr>
+
+<ul>
+    <?php foreach ($cars as $car) : ?>
+        <li><i><?=htmlspecialchars($car['make'])?> (<?=htmlspecialchars($car['id'])?>)</i></li>
+    <?php endforeach; ?>
+</ul>

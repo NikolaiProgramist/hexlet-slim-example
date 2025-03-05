@@ -1,0 +1,21 @@
+<h1>New Car</h1>
+
+<hr>
+
+<form action="/cars" method="post">
+    <div>
+        <label for="user[nickname]">Make:</label>
+        <input type="text" required name="car[make]" value="<?=!empty($car) ? $car['make'] : ''?>">
+        <?php if (!empty($errors)) : ?>
+            <div style="color: red"><span><?=$errors['nickname']?></span></div>
+        <?php endif; ?>
+    </div>
+    <div>
+        <label for="user[email]">Model:</label>
+        <input type="email" required name="car[model]" value="<?=!empty($car) ? $car['model'] : ''?>">
+        <?php if (!empty($errors)) : ?>
+            <div style="color: red"><span><?=$errors['email']?></span></div>
+        <?php endif; ?>
+    </div>
+    <input type="submit" value="Create">
+</form>
