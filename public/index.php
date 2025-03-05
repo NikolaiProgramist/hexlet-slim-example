@@ -60,7 +60,7 @@ $app->post('/users', function ($request, $response) use ($router) {
         $users = json_encode($users);
         $this->get('flash')->addMessage('success', 'User was added successfully');
 
-        return $response->withHeader('Set-Cookie', "users={$users}")->withRedirect($router->urlFor('users'), 302);
+        return $response->withHeader('Set-Cookie', "users={$users}; path=/")->withRedirect($router->urlFor('users'), 302);
     }
 
     $params = [
@@ -128,7 +128,7 @@ $app->patch('/users/{id}', function ($request, $response, array $args) use ($rou
         $users = json_encode($users);
         $this->get('flash')->addMessage('success', 'User updated successfully');
 
-        return $response->withHeader('Set-Cookie', "users={$users}")->withRedirect($router->urlFor('users'), 302);
+        return $response->withHeader('Set-Cookie', "users={$users}; path=/")->withRedirect($router->urlFor('users'), 302);
     }
 
     $params = [
@@ -146,7 +146,7 @@ $app->delete('/users/{id}', function ($request, $response, array $args) use ($ro
     $users = json_encode($users);
     $this->get('flash')->addMessage('success', 'User has been removed successfully');
 
-    return $response->withHeader('Set-Cookie', "users={$users}")->withRedirect($router->urlFor('users'), 302);
+    return $response->withHeader('Set-Cookie', "users={$users}; path=/")->withRedirect($router->urlFor('users'), 302);
 });
 
 $app->run();
