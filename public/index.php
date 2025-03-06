@@ -265,4 +265,54 @@ $app->post('/cars', function ($request, $response) use ($router) {
     return $this->get('renderer')->render($response->withStatus(422), 'cars/new.phtml', $params);
 })->setName('cars.store');
 
+$app->get('/cars/{id}/edit', function ($request, $response, array $args) use ($router) {
+    $id = $args['id'];
+    $carRepository = $this->get(CarRepository::class);
+    $car = $carRepository->find($id);
+
+    $params = [
+        'car' => $car,
+        'errors' => []
+    ];
+
+    return $this->get('renderer')->render($response, 'cars/edit.phtml', $params);
+})->setName('cars.edit');
+
+$app->patch('/cars/{id}', function ($request, $response, array $args) use ($router) {
+    $id = $args['id'];
+    $carData = $request->getParsedBodyParam('car');
+
+    $validator = new CarValidator();
+    $errors = $validator->validate($carData);
+
+    if (count($errors) === 0) {
+        $carRepository = $this->get(CarRepository::class);
+        $car = Car::fromArray([$carData['make'], $carData['model']]);
+        $car->setId($id);
+        $carRepository->update($car);
+        $this->get('flash')->addMessage('success', 'Car was updated successfully');
+
+        return $response->withRedirect($router->urlFor('cars.index'));
+    }
+
+    $car = Car::fromArray([$carData['make'], $carData['model']]);
+    $car->setId($id);
+
+    $params = [
+        'car' => $car,
+        'errors' => $errors
+    ];
+
+    return $this->get('renderer')->render($response->withStatus(422), 'cars/edit.phtml', $params);
+});
+
+$app->delete('/cars/{id}', function ($request, $response, array $args) use ($router) {
+    $id = (int) $args['id'];
+    $carRepository = $this->get(CarRepository::class);
+    $carRepository->delete($id);
+    $this->get('flash')->addMessage('success', 'Car was removed successfully');
+
+    return $response->withRedirect($router->urlFor('cars.index'));
+});
+
 $app->run();
