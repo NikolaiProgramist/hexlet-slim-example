@@ -1,5 +1,4 @@
 /vendor/
 .idea/
-cache/
 identifier.sqlite
 database.sqlite
