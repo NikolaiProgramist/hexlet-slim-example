@@ -257,8 +257,10 @@ $app->post('/cars', function ($request, $response) use ($router) {
         return $response->withRedirect($router->urlFor('cars.index'));
     }
 
+    $car = Car::fromArray([$carData['make'], $carData['model']]);
+
     $params = [
-        'car' => $carData,
+        'car' => $car,
         'errors' => $errors
     ];
 
