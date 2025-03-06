@@ -4,17 +4,17 @@
 
 <form action="/cars" method="post">
     <div>
-        <label for="user[nickname]">Make:</label>
-        <input type="text" required name="car[make]" value="<?=!empty($car) ? $car['make'] : ''?>">
+        <label for="make">Make:</label>
+        <input id="make" type="text" required name="car[make]" value="<?=htmlspecialchars($car['make'])?>">
         <?php if (!empty($errors)) : ?>
-            <div style="color: red"><span><?=$errors['nickname']?></span></div>
+            <div style="color: red"><span><?=$errors['make']?></span></div>
         <?php endif; ?>
     </div>
     <div>
-        <label for="user[email]">Model:</label>
-        <input type="email" required name="car[model]" value="<?=!empty($car) ? $car['model'] : ''?>">
+        <label for="model">Model:</label>
+        <input id="model" type="text" required name="car[model]" value="<?=htmlspecialchars($car['model'])?>">
         <?php if (!empty($errors)) : ?>
-            <div style="color: red"><span><?=$errors['email']?></span></div>
+            <div style="color: red"><span><?=$errors['model']?></span></div>
         <?php endif; ?>
     </div>
     <input type="submit" value="Create">

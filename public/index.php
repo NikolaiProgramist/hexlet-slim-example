@@ -215,6 +215,15 @@ $app->get('/cars', function ($request, $response) {
     return $this->get('renderer')->render($response, 'cars/index.phtml', $params);
 })->setName('cars.index');
 
+$app->get('/cars/new', function ($request, $response) {
+    $params = [
+        'car' => new Car(),
+        'errors' => []
+    ];
+
+    return $this->get('renderer')->render($response, 'cars/new.phtml', $params);
+})->setName('cars.create');
+
 $app->get('/cars/{id}', function ($request, $response, $args) {
     $carRepository = $this->get(CarRepository::class);
     $id = $args['id'];
@@ -233,15 +242,6 @@ $app->get('/cars/{id}', function ($request, $response, $args) {
 
     return $this->get('renderer')->render($response, 'cars/show.phtml', $params);
 })->setName('cars.show');
-
-$app->get('/cars/new', function ($request, $response) {
-    $params = [
-        'car' => new Car(),
-        'errors' => []
-    ];
-
-    return $this->get('renderer')->render($response, 'cars/new.phtml', $params);
-})->setName('cars.create');
 
 $app->post('/cars', function ($request, $response) use ($router) {
     $carRepository = $this->get(CarRepository::class);

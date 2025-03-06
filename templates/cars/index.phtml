@@ -19,6 +19,6 @@
 
 <ul>
     <?php foreach ($cars as $car) : ?>
-        <li><i><?=htmlspecialchars($car['make'])?> (<?=htmlspecialchars($car['id'])?>)</i></li>
+        <li><i><?=htmlspecialchars($car->getMake())?> (<?=htmlspecialchars($car->getId())?>)</i></li>
     <?php endforeach; ?>
 </ul>

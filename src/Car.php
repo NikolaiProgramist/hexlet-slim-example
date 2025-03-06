@@ -8,18 +8,20 @@ class Car
     private string $make;
     private string $model;
 
+    public function __construct(string $make = '', string $model = '')
+    {
+        $this->make = $make;
+        $this->model = $model;
+    }
+
     public static function fromArray(array $carProperties): Car
     {
-        $car = new Car();
-        $car->setMake($carProperties['make']);
-        $car->setModel($carProperties['model']);
-
-        return $car;
+        return new Car($carProperties[0], $carProperties[1]);
     }
 
     public function exists(): bool
     {
-        return $this->id;
+        return isset($this->id);
     }
 
     public function getId(): ?int
@@ -40,15 +42,5 @@ class Car
     public function setId(int $id): void
     {
         $this->id = $id;
-    }
-
-    public function setMake(string $make): void
-    {
-        $this->make = $make;
-    }
-
-    public function setModel(string $model): void
-    {
-        $this->model = $model;
     }
 }
