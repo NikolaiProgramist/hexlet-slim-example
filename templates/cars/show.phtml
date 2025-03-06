@@ -1,3 +1,8 @@
 <span>id = <?=htmlspecialchars($car->getId())?></span>
 <br>
 <span>Make = <?=htmlspecialchars($car->getMake())?></span>
+
+<form action="/cars/<?=htmlspecialchars($car->getId())?>>" method="post">
+    <input type="hidden" name="_METHOD" value="DELETE">
+    <input type="submit" value="Remove">
+</form>
