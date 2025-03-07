@@ -53,7 +53,7 @@ $app->get('/users', function ($request, $response) {
 
 $app->get('/users/new', function ($request, $response) {
     $params = [
-        'userData' => [],
+        'data' => [],
         'errors' => []
     ];
 
