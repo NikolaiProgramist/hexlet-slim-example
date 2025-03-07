@@ -45,11 +45,12 @@ $app->get('/users', function ($request, $response) {
 
     $params = [
         'flash' => $flash,
-        'users' => $resultUsers
+        'users' => $resultUsers,
+        'session' => isset($_SESSION['user'])
     ];
 
     return $this->get('renderer')->render($response, 'users/index.phtml', $params);
-})->setName('users');
+})->setName('users.index');
 
 $app->get('/users/new', function ($request, $response) {
     $params = [
@@ -58,7 +59,7 @@ $app->get('/users/new', function ($request, $response) {
     ];
 
     return $this->get('renderer')->render($response, 'users/new.phtml', $params);
-})->setName('newUser');
+})->setName('users.create');
 
 $app->post('/users', function ($request, $response) use ($router) {
     $validator = new UserValidator();
@@ -72,7 +73,7 @@ $app->post('/users', function ($request, $response) use ($router) {
         $users = json_encode($users);
         $this->get('flash')->addMessage('success', 'User was added successfully');
 
-        return $response->withHeader('Set-Cookie', "users={$users}; path=/; secure; httpOnly")->withRedirect($router->urlFor('users'), 302);
+        return $response->withHeader('Set-Cookie', "users={$users}; path=/; secure; httpOnly")->withRedirect($router->urlFor('users.index'), 302);
     }
 
     $params = [
@@ -87,7 +88,7 @@ $app->post('/users', function ($request, $response) use ($router) {
 $app->get('/courses/{id}', function ($request, $response, array $args) {
     $id = $args['id'];
     return $response->write("Course id: {$id}");
-})->setName('course');
+})->setName('course.show');
 
 $app->get('/users/{id}', function ($request, $response, array $args) {
     $id = $args['id'];
@@ -99,12 +100,11 @@ $app->get('/users/{id}', function ($request, $response, array $args) {
     }
     
     $params = [
-        'user' => $user,
-        'session' => isset($_SESSION['user'])
+        'user' => $user
     ];
 
     return $this->get('renderer')->render($response, 'users/show.phtml', $params);
-})->setName('user');
+})->setName('users.show');
 
 $app->get('/users/{id}/edit', function ($request, $response, array $args) use ($router) {
     $id = $args['id'];
@@ -113,7 +113,7 @@ $app->get('/users/{id}/edit', function ($request, $response, array $args) use ($
 
     if (empty($user)) {
         $this->get('flash')->addMessage('error', 'User not exists');
-        return $response->withRedirect($router->urlFor('users'), 404);
+        return $response->withRedirect($router->urlFor('users.index'), 404);
     }
 
     $params = [
@@ -122,7 +122,7 @@ $app->get('/users/{id}/edit', function ($request, $response, array $args) use ($
     ];
 
     return $this->get('renderer')->render($response, 'users/edit.phtml', $params);
-});
+})->setName('users.edit');
 
 $app->patch('/users/{id}', function ($request, $response, array $args) use ($router) {
     $id = $args['id'];
@@ -131,7 +131,7 @@ $app->patch('/users/{id}', function ($request, $response, array $args) use ($rou
 
     if (empty($user)) {
         $this->get('flash')->addMessage('error', 'User not exists');
-        return $response->withRedirect($router->urlFor('users'), 404);
+        return $response->withRedirect($router->urlFor('users.index'), 404);
     }
 
     $data = $request->getParsedBodyParam('user');
@@ -144,7 +144,7 @@ $app->patch('/users/{id}', function ($request, $response, array $args) use ($rou
         $users = json_encode($users);
         $this->get('flash')->addMessage('success', 'User updated successfully');
 
-        return $response->withHeader('Set-Cookie', "users={$users}; path=/; secure; httpOnly")->withRedirect($router->urlFor('users'), 302);
+        return $response->withHeader('Set-Cookie', "users={$users}; path=/; secure; httpOnly")->withRedirect($router->urlFor('users.index'), 302);
     }
 
     $params = [
@@ -162,7 +162,7 @@ $app->delete('/users/{id}', function ($request, $response, array $args) use ($ro
     $users = json_encode($users);
     $this->get('flash')->addMessage('success', 'User has been removed successfully');
 
-    return $response->withHeader('Set-Cookie', "users={$users}; path=/; secure; httpOnly")->withRedirect($router->urlFor('users'), 302);
+    return $response->withHeader('Set-Cookie', "users={$users}; path=/; secure; httpOnly")->withRedirect($router->urlFor('users.index'), 302);
 });
 
 $app->get('/login', function ($request, $response) {
@@ -172,7 +172,7 @@ $app->get('/login', function ($request, $response) {
     ];
 
     return $this->get('renderer')->render($response, 'users/login.phtml', $params);
-})->setName('loginUser');
+})->setName('users.login');
 
 $app->post('/login', function ($request, $response) use ($router) {
     $email = $request->getParsedBodyParam('user')['email'];
@@ -188,7 +188,7 @@ $app->post('/login', function ($request, $response) use ($router) {
         }
 
         $_SESSION['user'] = ['id' => $id, 'nickname' => $nickname];
-        return $response->withRedirect($router->urlFor('user', ['id' => $id]));
+        return $response->withRedirect($router->urlFor('users.show', ['id' => $id]));
     }
 
     $params = [
@@ -203,7 +203,7 @@ $app->delete('/logout', function ($request, $response) use ($router) {
     session_destroy();
     $_SESSION = [];
 
-    return $response->withRedirect($router->urlFor('users'));
+    return $response->withRedirect($router->urlFor('users.index'));
 });
 
 $app->get('/cars', function ($request, $response) {
