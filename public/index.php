@@ -40,7 +40,7 @@ $app->get('/users', function ($request, $response) {
     $flash = $this->get('flash')->getMessages();
     $users = json_decode($request->getCookieParam('users', json_encode([])), true);
     $u = $request->getParam('u');
-    $resultUsers = array_filter($users, fn ($user) => str_contains(strtolower($user['nickname']), strtolower($u)));
+    $resultUsers = array_filter($users, fn ($user) => str_contains(strtolower($user['nickname'] ?? ''), strtolower($u ?? '')));
     sort($resultUsers);
 
     $params = [
@@ -90,9 +90,9 @@ $app->get('/courses/{id}', function ($request, $response, array $args) {
 })->setName('course');
 
 $app->get('/users/{id}', function ($request, $response, array $args) {
+    $id = $args['id'];
     $users = json_decode($request->getCookieParam('users', json_encode([])), true);
-    $id = (int) $args['id'];
-    $user = array_values(array_filter($users, fn ($user) => $user['id'] === $id))[0];
+    $user = $users[$id];
 
     if (empty($user)) {
         return $response->withStatus(404);
@@ -109,7 +109,7 @@ $app->get('/users/{id}', function ($request, $response, array $args) {
 $app->get('/users/{id}/edit', function ($request, $response, array $args) use ($router) {
     $id = $args['id'];
     $users = json_decode($request->getCookieParam('users', json_encode([])), true);
-    $user = array_values(array_filter($users, fn ($user) => $user['id'] === (int) $id))[0];
+    $user = $users[$id];
 
     if (empty($user)) {
         $this->get('flash')->addMessage('error', 'User not exists');
@@ -127,7 +127,7 @@ $app->get('/users/{id}/edit', function ($request, $response, array $args) use ($
 $app->patch('/users/{id}', function ($request, $response, array $args) use ($router) {
     $id = $args['id'];
     $users = json_decode($request->getCookieParam('users', json_encode([])), true);
-    $user = array_values(array_filter($users, fn ($user) => $user['id'] === (int) $id))[0];
+    $user = $users[$id];
 
     if (empty($user)) {
         $this->get('flash')->addMessage('error', 'User not exists');
@@ -177,12 +177,16 @@ $app->get('/login', function ($request, $response) {
 $app->post('/login', function ($request, $response) use ($router) {
     $email = $request->getParsedBodyParam('user')['email'];
     $users = json_decode($request->getCookieParam('users', json_encode([])), true);
-    $user = array_values(array_filter($users, fn ($user) => $user['email'] === $email))[0];
-    $id = $user['id'];
-    $nickname = $user['nickname'];
+    $user = array_values(array_filter($users, fn ($user) => $user['email'] === $email));
 
-    if (isset($users[$id])) {
-        session_start();
+    if (!empty($user)) {
+        $id = $user[0]['id'];
+        $nickname = $user[0]['nickname'];
+
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+
         $_SESSION['user'] = ['id' => $id, 'nickname' => $nickname];
         return $response->withRedirect($router->urlFor('user', ['id' => $id]));
     }
